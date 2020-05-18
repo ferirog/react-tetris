@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 
+import { createStage } from '../gameHelpers';
+
 // Styled Components
 import { StyledTetrisWrapper, StyledTetris } from './styles/StyledTetris'
 
 //Custom Hooks
+import { useInterval } from '../hooks/useInterval';
 import { usePlayer } from '../hooks/usePlayer';
 import { useStage } from '../hooks/useStage';
 
@@ -11,17 +14,53 @@ import { useStage } from '../hooks/useStage';
 import Stage from './Stage'; //Papan Tetris-nya
 import Display from './Display'; //Tampilan Score, Rows, dan Level
 import StartButton from './StartButton'; //Button buat mulai game
+import TetrisNavbar from './TetrisNavbar';
 
 const Tetris = () => {
     const [dropTime, setDropTime] = useState(null);
     const [gameOver, setGameOver] = useState(false);
 
-    const [player] = usePlayer();
+    const [player, updatePlayerPos, resetPlayer] = usePlayer();
     const [stage, setStage] = useStage(player);
 
     console.log('re-render');
+
+    const movePlayer = dir => {
+        updatePlayerPos({ x: dir, y: 0 });
+    }
+
+    const startGame = () => {
+        //Reset everything
+        setStage(createStage());
+        resetPlayer();
+    }
+
+    const drop = () => {
+        updatePlayerPos({ x: 0, y: 1, collided: false })
+    }
+
+    const dropPlayer = () => {
+        drop();
+    }
+
+    // 37 itu key code buat left arrow, 39 right arrow, 40 down arrow, NO up arrow
+    // movePlayer(-1) itu gerakin ke kiri, kalo 1 ke kanan
+    // -1 axis, 1 axis
+
+    const move = ({ keyCode }) => {
+        if (!gameOver) {
+            if (keyCode === 37) {
+                movePlayer(-1);
+            } else if (keyCode === 39) {
+                movePlayer(1);
+            } else if (keyCode === 40) {
+                dropPlayer();
+            }
+        }
+    }
+
     return (
-        <StyledTetrisWrapper>
+        <StyledTetrisWrapper role="button" tabIndex="0" onKeyDown={e => move(e)}>
             <StyledTetris>
                 <Stage stage={stage} />
                 <aside>
@@ -34,12 +73,10 @@ const Tetris = () => {
                                 <Display text="Level" />
                             </div>
                         )}
-                    <StartButton />
+                    <StartButton callback={startGame} />
                 </aside>
             </StyledTetris>
         </StyledTetrisWrapper>
-    )
-
-}
-
+    );
+};
 export default Tetris;

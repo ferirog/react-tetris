@@ -6,10 +6,13 @@ import { createStage } from '../gameHelpers';
 export const useStage = (player, resetPlayer) => {
     const [stage, setStage] = useState(createStage());
 
+    // [] for dependency array
     useEffect(() => {
         const updateStage = prevStage => {
             // First flush the stage
+            // Use for loop if you care about performance (faster)
             const newStage = prevStage.map(row =>
+                // See gameHelpers.js
                 row.map(cell => (cell[1] === 'clear' ? [0, 'clear'] : cell)),
             );
 
@@ -28,12 +31,10 @@ export const useStage = (player, resetPlayer) => {
             if (player.collided) {
                 resetPlayer();
             }
-
             return newStage;
         };
 
-        setStage(prev => updateStage(prev));
+        setStage(prev => updateStage(prev))
     }, [player, resetPlayer]);
-
     return [stage, setStage];
-};
+}

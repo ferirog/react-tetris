@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyledStage} from './styles/StyledStage';
+import { StyledStage } from './styles/StyledStage';
 
 import Cell from './Cell';
 
@@ -11,11 +11,10 @@ import Cell from './Cell';
 // So we map through that row also and we get the cell
 
 // For each cell we are going to render out the cell component
-
 const Stage = ({ stage }) => (
     <StyledStage width={stage[0].length} height={stage.length}>
         {stage.map(row => row.map((cell, x) => <Cell key={x} type={cell[0]} />))}
     </StyledStage>
-)
+);
 
 export default Stage;

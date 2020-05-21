@@ -3,58 +3,61 @@ import React, { useState } from 'react';
 import { createStage, checkCollision } from '../gameHelpers';
 
 // Styled Components
-import { StyledTetrisWrapper, StyledTetris } from './styles/StyledTetris';
+import { StyledTetrisWrapper, StyledTetris } from './styles/StyledTetris'
 
-// Custom Hooks
+//Custom Hooks
+import { useInterval } from '../hooks/useInterval';
 import { usePlayer } from '../hooks/usePlayer';
 import { useStage } from '../hooks/useStage';
 
 // Components
-import Stage from './Stage';
-import Display from './Display';
-import StartButton from './StartButton';
+import Stage from './Stage'; //Papan Tetris-nya
+import Display from './Display'; //Tampilan Score, Rows, dan Level
+import StartButton from './StartButton'; //Button buat mulai game
 import TetrisNavbar from './TetrisNavbar';
 
 const Tetris = () => {
     const [dropTime, setDropTime] = useState(null);
     const [gameOver, setGameOver] = useState(false);
 
-    const [player, updatePlayerPos, resetPlayer, playerRotate] = usePlayer();
-    const [stage, setStage] = useStage(player, resetPlayer);
+    const [player, updatePlayerPos, resetPlayer] = usePlayer();
+    const [stage, setStage] = useStage(player);
 
     console.log('re-render');
 
     const movePlayer = dir => {
-        if (!checkCollision(player, stage, { x: dir, y: 0 })) {
+        if (!checkCollision(player, stage, {x: dir, y: 0})){
             updatePlayerPos({ x: dir, y: 0 });
         }
     }
 
     const startGame = () => {
-        console.log("test")
-        // Reset everything
+        //Reset everything
         setStage(createStage());
         resetPlayer();
         setGameOver(false);
     }
 
     const drop = () => {
-        if (!checkCollision(player, stage, { x: 0, y: 1 })) {
+        if (!checkCollision(player, stage, {x: 0, y: 1})){
             updatePlayerPos({ x: 0, y: 1, collided: false })
         } else {
-            // Game Over
-            if (player.pos.y < 1) {
+            if (player.pos.y < 1){
                 console.log("GAME OVER!!!");
                 setGameOver(true);
                 setDropTime(null);
             }
-            updatePlayerPos({ x: 0, y: 0, collided: true });
+            updatePlayerPos({x: 0, y: 0, collided: true});
         }
     }
 
     const dropPlayer = () => {
         drop();
     }
+
+    // 37 itu key code buat left arrow, 39 right arrow, 40 down arrow, NO up arrow
+    // movePlayer(-1) itu gerakin ke kiri, kalo 1 ke kanan
+    // -1 axis, 1 axis
 
     const move = ({ keyCode }) => {
         if (!gameOver) {
@@ -64,15 +67,12 @@ const Tetris = () => {
                 movePlayer(1);
             } else if (keyCode === 40) {
                 dropPlayer();
-            } else if (keyCode === 38) {
-                playerRotate(stage, 1);
             }
         }
     }
 
     return (
         <StyledTetrisWrapper role="button" tabIndex="0" onKeyDown={e => move(e)}>
-            <TetrisNavbar></TetrisNavbar>
             <StyledTetris>
                 <Stage stage={stage} />
                 <aside>
@@ -91,5 +91,4 @@ const Tetris = () => {
         </StyledTetrisWrapper>
     );
 };
-
 export default Tetris;
